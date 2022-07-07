@@ -1,0 +1,157 @@
+body {
+  background-color: #d3ebcd;
+  font-family: 'Merriweather', serif;
+  margin: 0;
+  text-align: center;
+}
+
+h1 {
+  font-family: 'Sacramento', cursive;
+  font-size: 5.625rem;
+  line-height: 2;
+  margin: 50px auto 0;
+}
+
+h1,
+h2 {
+  color: #66bfbf;
+}
+
+h2,
+h3 {
+  font-family: 'Montserrat', sans-serif;
+}
+
+h2 {
+  font-size: 2.5rem;
+  font-weight: normal;
+  padding-bottom: 20px;
+}
+
+h3 {
+  color: #11999e;
+}
+
+hr {
+  border: 6px;
+  border-style: dotted none none;
+  color: #eaf6f6;
+  margin: 100px auto;
+  width: 4%;
+}
+
+div {
+  background-color: #d3ebcd;
+}
+
+p {
+  line-height: 2;
+}
+
+div.middle-container {
+  padding: 100px 0;
+}
+
+.intro {
+  width: 30%;
+  margin: 0 auto;
+}
+
+div.top-container {
+  position: relative;
+  padding-top: 100px;
+}
+
+div.skill-row {
+  margin: 100px auto;
+  width: 50%;
+}
+
+div.skill-row h3,
+div.skill-row p {
+  text-align: left;
+}
+
+div.skill-row p {
+  line-height: 2;
+}
+
+div.skill-row img.js,
+div.skill-row img.react {
+  width: 25%;
+}
+
+div.skill-row img.react {
+  float: left;
+  margin-right: 30px;
+}
+
+div.skill-row img.js {
+  float: right;
+  margin-left: 30px;
+}
+
+img.profile-img,
+img.js,
+img.react {
+  border-radius: 50%;
+}
+
+img.profile-img {
+  margin-top: 100px;
+}
+
+.top-cloud {
+  position: absolute;
+  right: 200px;
+  top: 50px;
+}
+
+.bottom-cloud {
+  position: absolute;
+  left: 200px;
+}
+
+.contact-me {
+  padding: 20px;
+}
+
+.contact-me a {
+  background-color: #66bfbf;
+  background-image: linear-gradient(#11cdd4, #11999e);
+  border-radius: 8px;
+  color: white;
+  padding: 10px;
+  text-decoration: none;
+}
+
+.contact-me a:hover {
+  background-image: linear-gradient(#30e3cb, #2bc4ad);
+}
+
+.contact-message {
+  margin: 40px auto 60px;
+  width: 40%;
+}
+
+.bottom-container {
+  background-color: #66bfbf;
+  padding: 2rem;
+}
+
+.bottom-container a {
+  color: #11999e;
+  margin: 20px;
+  text-decoration: none;
+}
+
+.bottom-container a:hover {
+  color: #eaf6f6;
+}
+
+.bottom-container p {
+  color: #eaf6f6;
+  font-size: 0.8rem;
+  margin-bottom: 0;
+  margin: 1.2rem;
+}
