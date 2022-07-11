@@ -74,16 +74,16 @@ button {
 button.delete-btn {
   min-height: 50px;
   width: 50px;
+  background-color: #a683e3;
   border-radius: 8px;
   border-color: transparent;
-  background-color: #a683e3;
+  border-width: 0;
+  bottom: 14%;
   color: #fff;
   font-size: 30px;
   position: absolute;
   padding-bottom: 6px;
   right: 5%;
-  bottom: 14%;
-  border-width: 0;
 }
 
 input[type='text'] {
