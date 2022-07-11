@@ -10,20 +10,24 @@ app.set('view engine', 'ejs');
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
+let items = [];
+
 app.get('/', (req, res) => {
-  const days = {
-    1: 'Monday',
-    2: 'Tuesday',
-    3: 'Wednesday',
-    4: 'Thursday',
-    5: 'Friday',
-    6: 'Saturday',
-    0: 'Sunday',
+  const options = {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
   };
+  let today = new Date().toLocaleDateString('en-US', options);
 
-  let today = new Date().getDay();
+  res.render('list', { today, items });
+});
 
-  res.render('list', { today: days[today] });
+app.post('/', (req, res) => {
+  const { newItem } = req.body;
+  items.push(newItem);
+
+  res.redirect('/');
 });
 
 app.listen(PORT, () => {

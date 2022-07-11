@@ -7,6 +7,20 @@
     <title>TodoList with ejs!</title>
   </head>
   <body>
-    <h1>Today is <%= today %>!</h1>
+    <h1><%= today %></h1>
+    <ul id="todo-list">
+      <% for(const item of items) { %>
+      <li><%= item %></li>
+      <% } %>
+    </ul>
+    <form action="/" method="post">
+      <input
+        type="text"
+        name="newItem"
+        id="new-item"
+        placeholder="enter a new item"
+      />
+      <button type="submit">Add to list</button>
+    </form>
   </body>
 </html>
