@@ -28,6 +28,7 @@ h1 {
   display: flex;
   align-items: center;
   border-bottom: 1px solid #f1f1f1;
+  position: relative;
 }
 
 .item:last-child {
@@ -78,7 +79,10 @@ button.delete-btn {
   background-color: #a683e3;
   color: #fff;
   font-size: 30px;
+  position: absolute;
   padding-bottom: 6px;
+  right: 5%;
+  bottom: 14%;
   border-width: 0;
 }
 
