@@ -4,6 +4,8 @@ const bodyParser = require('body-parser');
 
 const app = express();
 
+const date = require(`${__dirname}/date.js`);
+
 const PORT = process.env.PORT || 3000;
 
 app.set('view engine', 'ejs');
@@ -15,14 +17,12 @@ app.use(express.static(`${__dirname}/public`));
 let items = [];
 
 app.get('/', (req, res) => {
-  const options = {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
-  };
-  let today = new Date().toLocaleDateString('en-US', options);
-
+  const today = date.getTodayDate();
   res.render('list', { today, items });
+});
+
+app.get('/about', (req, res) => {
+  res.render('about');
 });
 
 app.post('/add', (req, res) => {
