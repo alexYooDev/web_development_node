@@ -1,6 +1,6 @@
 //jshint esversion:6
 
-const MongoClient = require('mongodb').MongoClient;
+const { MongoClient } = require('mongodb');
 
 //testing
 const assert = require('assert');
@@ -17,5 +17,56 @@ client.connect((err) => {
 
   const db = client.db(dbName);
 
-  client.close();
+  findDocuments(db, () => {
+    client.close();
+  })
 });
+
+const insertDocuments = async (db, callback) => {
+  const collection = db.collection('fruits');
+
+  try {
+     const insertedResult = await collection.insertMany([
+      {
+        name: 'Apple',
+        score: 8, 
+        review: 'Great fruit'
+      },
+      {
+        name: 'Orange',
+        score: 6, 
+        review: 'Morning essentials'
+      },
+      {
+        name: 'Banana',
+        score: 9,
+        review: 'Meal alternatives'
+      }
+    ]);
+    console.log(`${insertedResult.insertedCount} documents were inserted.`);
+
+    callback();
+
+  } catch(e) {
+    console.log('error.')
+  }
+}
+
+const findDocuments = async (db, callback) => {
+  const collection = db.collection('fruits');
+
+  try {
+    const findResult = await collection.find();
+
+    console.log('Found the following records!');
+    await findResult.forEach(console.dir);
+
+    callback();
+
+  } catch(e) {
+
+    console.log('An error occured.');
+
+  }
+  
+}
