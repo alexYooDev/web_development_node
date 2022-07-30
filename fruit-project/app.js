@@ -1,26 +1,32 @@
 //jshint esversion:6
 
-const { MongoClient } = require('mongodb');
+const { mongoose } = require('mongoose');
 
 //testing
-const assert = require('assert');
 
 const url = 'mongodb://localhost:27017';
 
 const dbName = 'fruit-db';
 
-const client = new MongoClient(url);
+// const client = new MongoClient(url);
 
-client.connect((err) => {
-  assert.equal(null, err);
-  console.log('Connected successfully to server.');
+// client.connect((err) => {
+//   assert.equal(null, err);
+//   console.log('Connected successfully to server.');
 
-  const db = client.db(dbName);
+//   const db = client.db(dbName);
 
-  findDocuments(db, () => {
-    client.close();
-  })
-});
+//   findDocuments(db, () => {
+//     client.close();
+//   })
+// });
+
+const connectDb = async () => {
+  await mongoose.connect(`${url}/${dbName}`);
+  console.log('Database successfully connected!');
+}
+
+connectDb().catch(error => console.log(error));
 
 const insertDocuments = async (db, callback) => {
   const collection = db.collection('fruits');
@@ -48,7 +54,7 @@ const insertDocuments = async (db, callback) => {
     callback();
 
   } catch(e) {
-    console.log('error.')
+    console.log('Error: Something went wrong!');
   }
 }
 
@@ -58,7 +64,7 @@ const findDocuments = async (db, callback) => {
   try {
     const findResult = await collection.find();
 
-    console.log('Found the following records!');
+    console.log('Found the following records:');
     await findResult.forEach(console.dir);
 
     callback();
