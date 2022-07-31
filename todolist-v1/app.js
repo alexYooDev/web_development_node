@@ -76,7 +76,7 @@ app.post('/add', (req, res) => {
 
   const newListItem = new Item({
     name: newItem
-  })
+  });
 
   newListItem.save();
   
@@ -85,8 +85,16 @@ app.post('/add', (req, res) => {
 
 app.post('/delete', (req, res) => {
   const { deleteItem } = req.body;
-  items = items.filter((item) => item !== deleteItem);
-  res.redirect('/');
+  
+  // executes only when provided with a callback as a second parameter
+  Item.findByIdAndRemove(deleteItem, (error) => {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log(`Successfully deleted selected list item : ${deleteItem}`);
+      res.redirect('/');
+    }
+  });
 });
 
 app.listen(PORT, () => {
