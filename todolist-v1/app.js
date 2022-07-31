@@ -2,7 +2,6 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const {Schema, model} = require('mongoose');
-const e = require('express');
 
 const app = express();
 
@@ -41,6 +40,13 @@ const item3 = new Item({
 
 const defaultItems = [item1, item2, item3];
 
+const listSchema = new Schema({
+  name: String,
+  items: [itemSchema]
+});
+
+const List = model('List', listSchema);
+
 app.get('/', (req, res) => {
 
   Item.find({},(error, result) => {
@@ -62,39 +68,89 @@ app.get('/', (req, res) => {
     if (error) {
       console.log(error);
     } else {
-      res.render('list', { today: 'today', items: result });
+      res.render('list', { listTitle: 'today', items: result });
     }
   });
 });
+
+app.get('/:category', (req,res) => {
+
+  const categoryName = req.params.category;
+
+  List.findOne({name: categoryName}, (error, result) => {
+
+    if (error) {
+      console.log(error);
+    } 
+
+    if (result === null) {
+      const newList = new List({
+        name: categoryName,
+        items: defaultItems
+      });
+      newList.save();
+      res.redirect(`/${categoryName}`);
+    } else {
+      res.render('list', { listTitle: result.name, items: result.items });
+    }
+
+  })
+}) 
 
 app.get('/about', (req, res) => {
   res.render('about');
 });
 
 app.post('/add', (req, res) => {
-  const { newItem } = req.body;
+  const { newItem, list } = req.body;
 
   const newListItem = new Item({
     name: newItem
   });
 
-  newListItem.save();
-  
-  res.redirect('/');
+  if (list === 'today') {
+    newListItem.save();
+    res.redirect('/');
+  } else {
+    List.findOne({name: list},(error, result) => {
+      if (error) {
+        console.log(error);
+      } else {
+        result.items.push(newListItem);
+        result.save();
+        res.redirect(`/${list}`);
+        }
+      })
+  }
+
 });
 
 app.post('/delete', (req, res) => {
-  const { deleteItem } = req.body;
+  const { deleteItem, listName } = req.body;
+
+  if (listName === 'today') {
+
+    // executes only when provided with a callback as a second parameter
+    Item.findByIdAndRemove(deleteItem, (error) => {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log(`Successfully deleted selected list item : ${deleteItem}`);
+        res.redirect('/');
+      }
+    });
+    
+  } else {
+    List.findOneAndUpdate({name: listName}, {$pull: { items : {_id: deleteItem}}}, (error, result) => {
+
+      if (error) {
+        console.log(error);
+      } else {
+        res.redirect(`/${listName}`);
+      }
+    })
+  }
   
-  // executes only when provided with a callback as a second parameter
-  Item.findByIdAndRemove(deleteItem, (error) => {
-    if (error) {
-      console.log(error);
-    } else {
-      console.log(`Successfully deleted selected list item : ${deleteItem}`);
-      res.redirect('/');
-    }
-  });
 });
 
 app.listen(PORT, () => {

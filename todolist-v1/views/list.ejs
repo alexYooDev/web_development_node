@@ -3,7 +3,7 @@
   <%- include('header') %>
   <body>
     <div class="box">
-      <h1 id="heading"><%= today %></h1>
+      <h1 id="heading"><%= listTitle %></h1>
     </div>
     <div class="box">
       <% items.forEach((item) => { %>
@@ -11,6 +11,7 @@
         <input type="checkbox" />
         <li><%= item.name %></li>
         <form action="/delete" method="post">
+          <input type="hidden" name="listName" value="<%= listTitle %>"/>
           <button
             class="delete-btn"
             type="submit"
@@ -30,7 +31,7 @@
           placeholder="enter a new item"
           autocomplete="off"
         />
-        <button type="submit">+</button>
+        <button type="submit" name="list" value="<%= listTitle %>">+</button>
       </form>
     </div>
     <%- include('footer') %>
