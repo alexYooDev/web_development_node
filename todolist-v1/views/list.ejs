@@ -6,10 +6,10 @@
       <h1 id="heading"><%= today %></h1>
     </div>
     <div class="box">
-      <% for(const item of items) { %>
+      <% items.forEach((item) => { %>
       <ul class="item">
         <input type="checkbox" />
-        <li><%= item %></li>
+        <li><%= item.name %></li>
         <form action="/delete" method="post">
           <button
             class="delete-btn"
@@ -21,7 +21,7 @@
           </button>
         </form>
       </ul>
-      <% } %>
+      <% }) %>
       <form class="item" action="/add" method="post">
         <input
           type="text"

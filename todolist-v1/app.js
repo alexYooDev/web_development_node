@@ -1,8 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const date = require(`${__dirname}/date.js`);
 const mongoose = require('mongoose');
 const {Schema, model} = require('mongoose');
+const e = require('express');
 
 const app = express();
 
@@ -27,11 +27,37 @@ const itemSchema = new Schema({
   }
 })
 
-const Item = model('item', itemSchema);
+const Item = model('Item', itemSchema);
+
+const item1 = new Item({
+  name: 'buy groceries'
+});
+const item2 = new Item({
+  name: 'have lunch',
+});
+const item3 = new Item({
+  name: 'go for a walk',
+});
+
+const defaultItems = [item1, item2, item3];
+
+// Item.insertMany(defaultItems, (error) => {
+//   if (error) {
+//     console.log(error);
+//   } else {
+//     console.log('Successfully stored default items into the collection.')
+//   }
+// });
 
 app.get('/', (req, res) => {
-  const today = date.getTodayDate();
-  res.render('list', { today, items });
+
+  Item.find({},(error, result) => {
+    if (error) {
+      console.log(error)
+    } else {
+      res.render('list', { today: 'today', items: result });
+    }
+  });
 });
 
 app.get('/about', (req, res) => {
