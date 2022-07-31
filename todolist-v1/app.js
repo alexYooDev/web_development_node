@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const _ = require('lodash');
 const {Schema, model} = require('mongoose');
 
 const app = express();
@@ -75,7 +76,7 @@ app.get('/', (req, res) => {
 
 app.get('/:category', (req,res) => {
 
-  const categoryName = req.params.category;
+  const categoryName = _.capitalize(req.params.category);
 
   List.findOne({name: categoryName}, (error, result) => {
 
