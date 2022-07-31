@@ -30,7 +30,7 @@ const itemSchema = new Schema({
 const Item = model('Item', itemSchema);
 
 const item1 = new Item({
-  name: 'buy groceries'
+  name: 'buy groceries',
 });
 const item2 = new Item({
   name: 'have lunch',
@@ -41,19 +41,26 @@ const item3 = new Item({
 
 const defaultItems = [item1, item2, item3];
 
-// Item.insertMany(defaultItems, (error) => {
-//   if (error) {
-//     console.log(error);
-//   } else {
-//     console.log('Successfully stored default items into the collection.')
-//   }
-// });
-
 app.get('/', (req, res) => {
 
   Item.find({},(error, result) => {
+
+    // insert default items only for the first time.
+    if (result.length === 0) {
+
+      Item.insertMany(defaultItems, (error) => {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log('Successfully stored default items into the collection.');
+        }
+      });
+
+      res.redirect('/');
+    }
+
     if (error) {
-      console.log(error)
+      console.log(error);
     } else {
       res.render('list', { today: 'today', items: result });
     }
@@ -66,8 +73,13 @@ app.get('/about', (req, res) => {
 
 app.post('/add', (req, res) => {
   const { newItem } = req.body;
-  items.push(newItem);
 
+  const newListItem = new Item({
+    name: newItem
+  })
+
+  newListItem.save();
+  
   res.redirect('/');
 });
 
