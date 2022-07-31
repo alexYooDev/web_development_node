@@ -9,8 +9,15 @@ const dbName = 'fruit-db';
 
 
 const fruitSchema = new Schema({
-  name: String,
-  rating: Number,
+  name: {
+    type: String,
+    required: [true, 'Please check your data entry, no name specified.']
+   },
+  score: {
+    type: Number,
+    min: 1,
+    max: 10
+  },
   review: String,
 });
 
@@ -35,24 +42,49 @@ const createDocuments = async (callback) => {
 
   // await fruit.save();
 
-  // const personSchema = new Schema({
-  //   name: String,
-  //   age: Number
-  // });
+  const personSchema = new Schema({
+    name: String,
+    age: Number,
+    favoriteFruit: fruitSchema
+  });
 
-  // const Person = model('Person', personSchema);
+  const Person = model('Person', personSchema);
 
-  // const person = new Person({
-  //   name: 'John',
-  //   age: 37
+  // const peach = new Fruit({
+  //   name: 'Peach',
+  //   score: 7,
+  //   review: 'Pink juicy peach'
   // })
 
-  // await person.save();
+  // peach.save();
+
+  const pineapple = new Fruit({
+    name: 'Pineapple',
+    score: 10,
+    review: 'Tropical gold'
+  });
+  
+  pineapple.save();
+
+  const person = new Person({
+    name: 'Harry',
+    age: 32,
+    favoriteFruit: pineapple
+  });
+
+  await person.save();
 
   await callback();
 };
 
 const createFruits = async (callback) => {
+
+  const apple = new Fruit({
+    name: 'Apple',
+    score: 9,
+    review: 'The king of the fruit'
+  })
+
   const kiwi = new Fruit({
     name: 'Kiwi',
     score: 6,
@@ -71,30 +103,79 @@ const createFruits = async (callback) => {
     review: 'Decent food supplement'
   });
 
-  Fruit.insertMany([kiwi,orange,banana], (err) => {
+  Fruit.insertMany([apple,kiwi,orange,banana], (err) => {
     if (err) {
       console.log(err);
     } else {
-      console.log('successfully added all the fruits to db')
+      mongoose.connection.close();
+      console.log('successfully added all the fruits to db');
     }
   })
+
+  callback();
 }
 
-const findFruits = async () => {
-  await Fruit.find((error, fruits) => {
+const findFruits = (callback) => {
+  Fruit.find((error, fruits) => {
     if (error) {
       console.log(error);
     } else {
       console.log(fruits);
     }
   })
+
+  callback();
 }
+
+const logFruitsNames = (callback) => {
+  Fruit.find((error, fruits) => {
+    if (error) {
+      console.log(error);
+    } else {
+ 
+      mongoose.connection.close();
+
+      fruits.forEach((fruit) => {
+        console.log(fruit.name);
+      })
+    }
+  })
+};
+
+const updateFruit = () => {
+  Fruit.updateOne({name: 'Orange'}, {name: 'Peach'}, (error) => {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log('Successfully updated the document!');
+    }
+  })
+};
+
+const deleteFruit = () => {
+  Fruit.deleteOne({name: 'Peach'}, (error) => {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log('Successfully deleted the document!');
+    }
+  })
+};
+
 
 connectDb().catch((error) => {
   console.log(error);
 });
 
-findFruits();
+// logFruitsNames();
+
+createDocuments(()=> {
+  console.log('Successfully inserted documents!');
+});
+
+// deleteFruit();
+
+// updateFruit();
 
 // createFruits(() => {
 //   console.log('Successfully inserted documents!');
