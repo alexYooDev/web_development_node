@@ -3,7 +3,27 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const ejs = require('ejs');
+const mongoose = require('mongoose');
+const { model, Schema } = require('mongoose');
 const _ = require('lodash');
+
+const app = express();
+
+app.set('view engine', 'ejs');
+
+const postSchema = new Schema({
+  title: {
+    type: String,
+    required: true
+  },
+  post: {
+    type: String,
+    required: true
+  }
+})
+
+
+const Post = model('post', postSchema);
 
 const homeStartingContent =
   'Lacus vel facilisis volutpat est velit egestas dui id ornare. Semper auctor neque vitae tempus quam. Sit amet cursus sit amet dictum sit amet justo. Viverra tellus in hac habitasse. Imperdiet proin fermentum leo vel orci porta. Donec ultrices tincidunt arcu non sodales neque sodales ut. Mattis molestie a iaculis at erat pellentesque adipiscing. Magnis dis parturient montes nascetur ridiculus mus mauris vitae ultricies. Adipiscing elit ut aliquam purus sit amet luctus venenatis lectus. Ultrices vitae auctor eu augue ut lectus arcu bibendum at. Odio euismod lacinia at quis risus sed vulputate odio ut. Cursus mattis molestie a iaculis at erat pellentesque adipiscing.';
@@ -12,19 +32,26 @@ const aboutContent =
 const contactContent =
   'Scelerisque eleifend donec pretium vulputate sapien. Rhoncus urna neque viverra justo nec ultrices. Arcu dui vivamus arcu felis bibendum. Consectetur adipiscing elit duis tristique. Risus viverra adipiscing at in tellus integer feugiat. Sapien nec sagittis aliquam malesuada bibendum arcu vitae. Consequat interdum varius sit amet mattis. Iaculis nunc sed augue lacus. Interdum posuere lorem ipsum dolor sit amet consectetur adipiscing elit. Pulvinar elementum integer enim neque. Ultrices gravida dictum fusce ut placerat orci nulla. Mauris in aliquam sem fringilla ut morbi tincidunt. Tortor posuere ac ut consequat semper viverra nam libero.';
 
-const app = express();
+const url = 'mongodb://localhost:27017';
+const dbName = 'blog-app';
 
-app.set('view engine', 'ejs');
-
-const posts = [];
+mongoose.connect(`${url}/${dbName}`);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
 app.get('/', (req, res) => {
+
   const textContent = homeStartingContent;
 
-  res.render('home', { textContent, posts });
+  Post.find({}, (error, posts) => {
+    if (error) {
+      console.log(error);
+    } else {
+      res.render('home', { textContent, posts });
+    }
+  });
+
 });
 
 app.get('/about', (req, res) => {
@@ -44,29 +71,42 @@ app.get('/compose', (req,res) => {
 app.post('/compose', (req, res) => {
   const { title, post } = req.body;
 
-  const postItem = {
-    title,
-    post,
-  };
-  posts.push(postItem);
+  const newPost = new Post({ title, post });
+  
+  newPost.save((error) => {
+    if (error) {
+      console.log(error);
+    } else {
+      res.redirect('/');
+    }
+  });
 
-  res.redirect('/');
 });
 
 
 app.get('/posts/:postId', (req,res) => {
-  
-  posts.forEach((post) => {
 
-    let postTitle = _.lowerCase(post.title);
-    postTitle = _.kebabCase(postTitle);
-    
-    if (postTitle === req.params.postId) {
-      res.render('post', {detailTitle: postTitle, detailContent: post.post})
+  const postId = req.params.postId;
+
+  Post.findById(postId, (error,post) => {
+    if (error) {
+      console.log(error);
     } else {
-      console.log('No match!')
+      res.render('post', { detailTitle: post.title, detailContent: post.post });
     }
   })
+  
+  // posts.forEach((post) => {
+
+  //   let postTitle = _.lowerCase(post.title);
+  //   postTitle = _.kebabCase(postTitle);
+    
+  //   if (postTitle === req.params.postId) {
+  //     res.render('post', {detailTitle: postTitle, detailContent: post.post})
+  //   } else {
+  //     console.log('No match!')
+  //   }
+  // })
 })
 
 app.listen(3000, function () {
