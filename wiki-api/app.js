@@ -55,10 +55,20 @@ app.post('/articles', (req,res) => {
       console.log(error);
     } else {
       console.log('Successfully created and inserted a new article to the collection!');
-      console.log(result);
+      res.send(result);
     }
   });
-  
+});
+
+app.delete('/articles', (req,res) => {
+  Article.deleteMany({}, (error, result) => {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log('Successfully deleted all the articles in the collection!');
+      res.send(result);
+    }
+  })
 })
 
 app.listen(PORT, () => {
