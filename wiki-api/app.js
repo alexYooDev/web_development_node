@@ -32,16 +32,33 @@ const articleSchema = new Schema({
 
 const Article = model('article', articleSchema);
 
-app.get('/', (req,res) => {
+app.get('/articles', (req,res) => {
 
   Article.find({}, (error, result) => {
     if (error) {
       console.log(error);
     } else {
-      console.log(result);
+      res.send(result);
     }
   })
 
+})
+
+app.post('/articles', (req,res) => {
+
+  const {title, content} = req.body;
+
+  const newArticle = new Article({title, content});
+
+  newArticle.save((error, result) => {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log('Successfully created and inserted a new article to the collection!');
+      console.log(result);
+    }
+  });
+  
 })
 
 app.listen(PORT, () => {
