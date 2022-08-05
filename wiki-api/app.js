@@ -32,44 +32,64 @@ const articleSchema = new Schema({
 
 const Article = model('article', articleSchema);
 
-app.get('/articles', (req,res) => {
-
-  Article.find({}, (error, result) => {
-    if (error) {
-      console.log(error);
-    } else {
-      res.send(result);
-    }
+app
+  .route('articles')
+  .get( (req, res) => {
+    Article.find({}, (error, result) => {
+      if (error) {
+        console.log(error);
+      } else {
+        res.send(result);
+      }
+    });
   })
+  .post((req, res) => {
+    const { title, content } = req.body;
 
-})
+    const newArticle = new Article({ title, content });
 
-app.post('/articles', (req,res) => {
-
-  const {title, content} = req.body;
-
-  const newArticle = new Article({title, content});
-
-  newArticle.save((error, result) => {
-    if (error) {
-      console.log(error);
-    } else {
-      console.log('Successfully created and inserted a new article to the collection!');
-      res.send(result);
-    }
+    newArticle.save((error, result) => {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log(
+          'Successfully created and inserted a new article to the collection!'
+        );
+        res.send(result);
+      }
+    });
+  })
+  .delete((req, res) => {
+    Article.deleteMany({}, (error, result) => {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('Successfully deleted all the articles in the collection!');
+        res.send(result);
+      }
+    });
   });
-});
 
-app.delete('/articles', (req,res) => {
-  Article.deleteMany({}, (error, result) => {
-    if (error) {
-      console.log(error);
-    } else {
-      console.log('Successfully deleted all the articles in the collection!');
-      res.send(result);
-    }
-  })
-})
+  /* Specific Routing */
+
+  app.route('/articles/:title')
+    .get((req,res) => {
+      const title = req.params.title;
+
+      Article.findOne({title}, (error, result) => {
+        if (error) {
+          console.log(error);
+        }
+
+        if (result !== null) {
+          res.send(result);
+        } else {
+          console.log('Could not find the specific article');
+          res.end();
+        }
+      })
+
+    })
 
 app.listen(PORT, () => {
   console.log('Server now listening at port number : 3000');
