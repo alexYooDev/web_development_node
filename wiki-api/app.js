@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
 const {model, Schema} = require('mongoose');
+const e = require('express');
 
 const app = express();
 
@@ -73,7 +74,7 @@ app
   /* Specific Routing */
 
   app.route('/articles/:title')
-    .get((req,res) => {
+    .get((req, res) => {
       const title = req.params.title;
 
       Article.findOne({title}, (error, result) => {
@@ -81,14 +82,74 @@ app
           console.log(error);
         }
 
-        if (result !== null) {
+        if (result) {
           res.send(result);
         } else {
           console.log('Could not find the specific article');
           res.end();
         }
       })
+    })
+    .put((req, res) => {
+      const title = req.params.title;
 
+      const newTitle = req.body.title;
+      const newContent = req.body.content;
+
+      Article.updateOne(
+        {title}, 
+        {title: newTitle, content: newContent},
+
+        (error, result) => {
+        if (error) {
+          console.log(error);
+        }
+
+        if (result) {
+          res.send(result);
+        } else {
+          console.log('Update failed');
+        }
+      });
+    })
+    .patch((req, res) => {
+
+      Article.updateOne(
+        {title},
+        {$set: req.body},
+        (error, result) => {
+          if (error) {
+            console.log(error)
+          }
+
+          if (result) {
+            Article.findOne({title: req.body.title}, (error, article) => {
+              if (error) {
+                console.log(error);
+              }
+
+              if (result) {
+                res.send(article)
+              }
+            })
+          }
+        } 
+      )
+    })
+    .delete((req, res) => {
+      const title = req.params.title;
+
+      Article.findOneAndDelete({title}, (error, result) => {
+        if (error) {
+          console.log(error);
+        }
+
+        if (result) {
+          res.send(result);
+        } else {
+          console.log('Could not find requested article.');
+        }
+      })
     })
 
 app.listen(PORT, () => {

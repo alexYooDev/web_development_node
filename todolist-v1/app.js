@@ -16,9 +16,9 @@ app.use(express.static(`${__dirname}/public`));
 // let items = [];
 
 const dbName = 'todolistDB';
-const url = `mongodb://localhost:27017`;
+const url = 'mongodb+srv://admin-alex:Free200209!@cluster0.uutaw.mongodb.net/todolistDB';
 
-mongoose.connect(`${url}/${dbName}`);
+mongoose.connect(url);
 
 const itemSchema = new Schema({
   name: {
