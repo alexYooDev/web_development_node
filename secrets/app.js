@@ -1,9 +1,14 @@
+require('dotenv').config();
+
 const express = require('express');
 const bodyParser = require('body-parser');
 const ejs = require('ejs');
 const mongoose = require('mongoose');
 const { model, Schema } = require('mongoose');
-const encrypt = require('mongoose-encryption');
+// const md5 = require('md5');
+const bcrypt = require('bcrypt');
+
+const saltRounds = 10;
 
 const app = express();
 
@@ -26,9 +31,9 @@ const userSchema = new Schema({
   }
 });
 
-const secret = 'Thisisourlittlesecret.';
+const SECRET = process.env.secret;
 
-userSchema.plugin(encrypt, {secret, encryptedFields: ['password']});
+// userSchema.plugin(encrypt, {secret: SECRET, encryptedFields: ['password']});
 
 const User = model('User', userSchema);
 
@@ -47,33 +52,42 @@ app.get('/register', (req, res) => {
 app.post('/register', (req, res) => {
   const { username, password } = req.body;
 
-  const newUser = new User({email: username, password});
+  bcrypt.hash(password, saltRounds, (error, hash) => {
 
-  newUser.save((error) => {
-    if (error) {
-      console.log(error);
-    } else {
-      res.render('secrets');
-    }
-  })
+    const newUser = new User({email: username, password: hash});
+    
+    newUser.save((error) => {
+      if (error) {
+        console.log(error);
+      } else {
+        res.render('secrets');
+      }
+    })
+  });
+
 })
 
 app.post('/login', (req, res) => {
   const {username, password} = req.body;
 
-  User.findOne({ $and: [{username}, {password}]}, (error, result) => {
+  User.findOne({email: username}, 
+  (error, user) => {
     if (error) {
       console.log(error);
     } 
 
-    if (result !== null) {
-      console.log(result);
-      res.render('secrets');
+    if (user !== null) {
+      bcrypt.compare(password, user.password, (error, result) => {
+        if (result === true) {
+          res.render('secrets');
+        }
+      });
+
     } else {
       console.log('No user found under that email and password');
     }
-  })
-})
+  });
+});
 
 app.listen(PORT, () => {
   console.log('The server is running on the port: ' + PORT)
