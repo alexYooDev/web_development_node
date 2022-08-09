@@ -7,6 +7,7 @@ const ejs = require('ejs');
 /* DB */
 const mongoose = require('mongoose');
 const { model, Schema } = require('mongoose');
+const findOrCreate = require('mongoose-findorcreate');
 
 // const md5 = require('md5');
 const bcrypt = require('bcrypt');
@@ -16,8 +17,9 @@ const saltRounds = 10;
 const session = require('express-session');
 const passport = require('passport');
 const passportLocalMongoose = require('passport-local-mongoose');
-const e = require('express');
-const { authenticate } = require('passport');
+
+/* OAUTH 2.0*/
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
 const app = express();
 
@@ -34,6 +36,9 @@ app.use(session({
   saveUninitialized: false,
 }));
 
+
+
+
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -45,10 +50,12 @@ const userSchema = new Schema({
   },
   password: {
     type: String,
-  }
+  },
+  googleId: String
 });
 
 userSchema.plugin(passportLocalMongoose);
+userSchema.plugin(findOrCreate);
 
 // const SECRET = process.env.secret;
 
@@ -56,14 +63,46 @@ userSchema.plugin(passportLocalMongoose);
 
 const User = model('User', userSchema);
 
+/* Google OAUTH */
+
+passport.use(new GoogleStrategy({
+  clientID: process.env.CLIENT_ID,
+  clientSecret: process.env.CLIENT_SECRET,
+  callbackURL: 'http://localhost:3000/auth/google/secrets'
+},
+  (accessToken, refreshToken, profile, callback) => {
+    console.log(profile);
+    User.findOrCreate({ googleId: profile.id }, (error, user) => {
+      return callback(error, user);
+    })
+  }))
+
 passport.use(User.createStrategy());
 
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser((id, done) => {
+  User.findById(id, (error, user) => {
+    done(error, user);
+  })
+});
 
 app.get('/', (req, res) => {
   res.render('home');
 });
+
+app.get('/auth/google', 
+  passport.authenticate('google', { scope: ['profile']})
+);
+
+app.get('/auth/google/secrets', 
+  passport.authenticate('google', {failureRedirect: '/login'}),
+  (req, res) => {
+    res.redirect('/secrets');
+  }
+)
 
 app.get('/login', (req, res) => {
   res.render('login')
@@ -91,7 +130,7 @@ app.post('/register', (req, res) => {
     } else {
       passport.authenticate('local')(req, res, () => {
         res.redirect('/secrets');
-      })
+      });
     }
   })
 
